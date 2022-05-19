@@ -1,8 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const app = express();
-const path = require('path');
+let path = require('path');
 const router = express.Router();
+var http = require('http')
+
 
 router.get('/',function(req,res){
     res.sendFile(path.join(__dirname+'/treeView.html'));
@@ -14,6 +16,11 @@ router.get('/getData',function(req,res){
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(obj));
 });
+
+router.get('/images/:documentName',function(req,res){
+    res.sendFile('/Users/ecemvarma/WebstormProjects/CitiesTree/images/'+req.params['documentName']);
+});
+
 
 //add the router
 app.use('/', router);
