@@ -3,12 +3,10 @@ const fs = require('fs');
 const app = express();
 let path = require('path');
 const router = express.Router();
-var http = require('http')
 
 
 router.get('/',function(req,res){
     res.sendFile(path.join(__dirname+'/treeView.html'));
-    //__dirname : It will resolve to your project folder.
 });
 
 router.get('/getData',function(req,res){
