@@ -5,6 +5,14 @@
   <script src="https://unpkg.com/gojs@2.2.9/release/go.js"></script>
   <div id="allSampleContent" class="p-4 w-full">
     <script id="code">
+
+      cities_info = {}
+
+      function showInfoAlert(e, obj) {
+        var node = obj.part.adornedPart;  // the Node with the context menu
+        var buttontext = obj.elt(1);  // the TextBlock
+        alert(cities_info[node.data.key.toString()]);
+      }
     // use a V figure instead of MinusLine in the TreeExpanderButton
     go.Shape.defineFigureGenerator("ExpandedLine", (shape, w, h) => {
       return new go.Geometry()
@@ -66,6 +74,7 @@
                         // a custom function to allow expanding/collapsing on double-click
                         // this uses similar logic to a TreeExpanderButton
                         doubleClick: (e, node) => {
+                          console.log('dc')
                           var cmd = myDiagram.commandHandler;
                           if (node.isTreeExpanded) {
                             if (!cmd.canCollapseTree(node)) return;
@@ -78,8 +87,18 @@
                           } else {
                             cmd.expandTree(node);
                           }
-                        }
+                        },
+
+                        /*contextMenu: (e, node) => {
+                          console.log('yess')
+                          console.log(e, node)
+                          console.log(node.ib.key)
+                        }*/
+
+
+
                       },
+
                       $("TreeExpanderButton",
                               { // customize the button's appearance
                                 "_treeExpandedFigure": "ExpandedLine",
@@ -92,6 +111,7 @@
                       $(go.Panel, "Horizontal",
                               {position: new go.Point(18, 0)},
                               new go.Binding("background", "isSelected", s => s ? "lightblue" : "white").ofObject(),
+                              //new go.Binding("onclick", "isSelected", s => s ? doSomething(s) : null).ofObject(),
 
                               $(go.Picture,
                                       {
@@ -105,7 +125,16 @@
                                       new go.Binding("source", "isTreeLeaf", imageConverter).ofObject()),
                               $(go.TextBlock,
                                       {font: '9pt Verdana, sans-serif'},
-                                      new go.Binding("text", "key", s => s))
+                                      new go.Binding("text", "key", s => s)),
+                              {
+                                contextMenu:                            // define a context menu for each node
+                                        $("ContextMenu",              // that has several buttons around
+                                                $(go.Placeholder, { padding: 5 }),  // a Placeholder object
+                                                $("ContextMenuButton", $(go.TextBlock, "Info"),
+                                                        { alignment: go.Spot.Right, alignmentFocus: go.Spot.Left, click: showInfoAlert }),
+
+                                        )  // end Adornment
+                              },
 
                       )  // end Horizontal Panel
 
@@ -117,14 +146,15 @@
       let myData = await fetchAsync('http://localhost:3000/getData');
       let cities = myData.data
       cities_tree = []
-      country_name = "Türkiye"
-      cities_tree.push({key:country_name})
       for (let city in cities) {
         city_name = cities[city]["il_adi"]
-        cities_tree.push({key: city_name, parent:country_name })
+        cities_info[city_name]= "nüfus: " + cities[city]["nufus"] + "\nyuzolcumu: " + cities[city]["yuzolcumu"]
+        cities_tree.push({key: city_name })
         regions = cities[city]["ilceler"]
         for(let region in regions){
           cities_tree.push({key: regions[region]["ilce_adi"], parent: city_name})
+          cities_info[regions[region]["ilce_adi"]]= "nüfus: " + regions[region]["nufus"] + "\nyuzolcumu: " + regions[region]["yuzolcumu"]
+
         }
 
       }
