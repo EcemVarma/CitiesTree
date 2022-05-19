@@ -18,7 +18,7 @@ router.get('/getData',function(req,res){
 });
 
 router.get('/images/:documentName',function(req,res){
-    res.sendFile('/Users/ecemvarma/WebstormProjects/CitiesTree/images/'+req.params['documentName']);
+    res.sendFile(path.join(__dirname + '/images/' + req.params['documentName']));
 });
 
 
